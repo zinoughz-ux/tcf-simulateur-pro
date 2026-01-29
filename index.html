@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Simulateur TCF Canada</title>
+
+<style>
+body{
+  margin:0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: linear-gradient(135deg,#0f172a,#020617);
+  color:#e5e7eb;
+  transition:0.3s;
+}
+body.light{
+  background:#f1f5f9;
+  color:#020617;
+}
+.container{max-width:1000px;margin:auto;padding:20px;}
+h1{text-align:center;color:#38bdf8;}
+#timer{text-align:center;font-size:28px;color:#22c55e;margin-bottom:20px;font-weight:bold;}
+
+.task{
+  background:#020617;
+  border-radius:14px;
+  padding:20px;
+  margin-bottom:20px;
+  box-shadow:0 0 15px rgba(56,189,248,0.15);
+}
+body.light .task{background:white;}
+
+.subject{
+  width:100%;
+  padding:12px;
+  border-radius:8px;
+  border:none;
+  margin-bottom:10px;
+  font-size:18px;
+}
+textarea{
+  width:100%;
+  min-height:240px;
+  padding:14px;
+  border-radius:8px;
+  border:none;
+  resize:vertical;
+  font-size:18px;
+  font-weight:500;
+}
+.counter{margin-top:5px;color:#22c55e;font-weight:bold;}
+
+button{
+  display:block;
+  margin:15px auto;
+  padding:16px 40px;
+  font-size:18px;
+  border:none;
+  border-radius:40px;
+  cursor:pointer;
+  background:linear-gradient(135deg,#22d3ee,#38bdf8);
+  color:#020617;
+  font-weight:bold;
+  box-shadow:0 0 20px rgba(56,189,248,0.4);
+}
+button:hover{transform:scale(1.05);}
+
+.tools{text-align:center;margin-bottom:10px;}
+.tools button{margin:5px;}
+
+#specials{
+  text-align:center;
+  margin-bottom:15px;
+}
+#specials span{
+  cursor:pointer;
+  padding:6px 10px;
+  font-size:20px;
+  background:#1e293b;
+  border-radius:8px;
+  margin:2px;
+  display:inline-block;
+}
+#specials span:hover{background:#38bdf8;color:black;}
+
+footer{text-align:center;color:#94a3b8;margin-top:20px;}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>Simulateur Expression Écrite – TCF Canada</h1>
+<div id="timer">60:00</div>
+
+<div class="tools">
+<button onclick="toggleMode()">🌙 / ☀️ Mode</button>
+</div>
+
+<div id="specials">
+Caractères : 
+<span>é</span><span>è</span><span>ê</span><span>à</span><span>ç</span>
+<span>ô</span><span>î</span><span>û</span><span>œ</span><span>€</span>
+</div>
+
+<div class="task">
+<h2>TÂCHE 1</h2>
+<input id="subject1" class="subject" placeholder="Sujet tâche 1">
+<textarea id="task1"></textarea>
+<div id="c1" class="counter">0 mots</div>
+</div>
+
+<div class="task">
+<h2>TÂCHE 2</h2>
+<input id="subject2" class="subject" placeholder="Sujet tâche 2">
+<textarea id="task2"></textarea>
+<div id="c2" class="counter">0 mots</div>
+</div>
+
+<div class="task">
+<h2>TÂCHE 3</h2>
+<input id="subject3" class="subject" placeholder="Sujet tâche 3">
+<textarea id="task3"></textarea>
+<div id="c3" class="counter">0 mots</div>
+</div>
+
+<button id="oneClickChatGPT">📋 One-Click ChatGPT</button>
+<footer>© Simulateur TCF Canada</footer>
+
+</div>
+
+<script>
+/* ===== CHRONO ===== */
+let time=3600;
+setInterval(()=>{
+  const m=String(Math.floor(time/60)).padStart(2,"0");
+  const s=String(time%60).padStart(2,"0");
+  timer.innerText=m+":"+s;
+  if(time>0)time--;
+},1000);
+
+/* ===== COMPTEUR MOTS ===== */
+function setupCounter(textId,counterId){
+  document.getElementById(textId).addEventListener("input",()=>{
+    const val=document.getElementById(textId).value.trim();
+    const n=val ? val.split(/\s+/).length : 0;
+    document.getElementById(counterId).innerText=n+" mots";
+  });
+}
+setupCounter("task1","c1");
+setupCounter("task2","c2");
+setupCounter("task3","c3");
+
+/* ===== MODE ===== */
+function toggleMode(){
+  document.body.classList.toggle("light");
+}
+
+/* ===== CARACTÈRES SPÉCIAUX (corrigé) ===== */
+let lastFocusedTextarea=null;
+document.querySelectorAll("textarea").forEach(t=>{
+  t.addEventListener("focus",()=>lastFocusedTextarea=t);
+});
+
+document.querySelectorAll("#specials span").forEach(el=>{
+  el.addEventListener("click",()=>{
+    if(!lastFocusedTextarea) return alert("Clique d'abord dans un champ de texte");
+    lastFocusedTextarea.value += el.textContent;
+    lastFocusedTextarea.focus();
+    lastFocusedTextarea.dispatchEvent(new Event("input"));
+  });
+});
+
+/* ===== ONE CLICK CHATGPT (corrigé) ===== */
+document.getElementById("oneClickChatGPT").addEventListener("click",()=>{
+
+  const subject1=document.getElementById("subject1").value;
+  const subject2=document.getElementById("subject2").value;
+  const subject3=document.getElementById("subject3").value;
+
+  const task1=document.getElementById("task1").value;
+  const task2=document.getElementById("task2").value;
+  const task3=document.getElementById("task3").value;
+
+  const prompt = `
+Tu es examinateur officiel du TCF Canada.
+Corrige selon les critères officiels :
+- respect de la consigne
+- cohérence et organisation
+- richesse lexicale vocabulaire
+- grammaire et orthographe
+
+Pour chaque tâche :
+- donne une note sur 20
+- donne un niveau estimé (A2 / B1 / B2 / C1 / C2)
+- donne 3 conseils précis
+
+À la fin :
+- donne une note globale sur 20 (0–3 → A1 / 4–6 → A2 / 7–9 → B1 / 10–12 → B2 / 13–15 → C1 / 16–20 → C2)
+- donne le niveau global TCF Canada
+
+====================
+TÂCHE 1
+====================
+Sujet :
+${subject1 || "❌ Sujet non renseigné"}
+
+Texte :
+${task1 || "❌ Texte vide"}
+
+====================
+TÂCHE 2
+====================
+Sujet :
+${subject2 || "❌ Sujet non renseigné"}
+
+Texte :
+${task2 || "❌ Texte vide"}
+
+====================
+TÂCHE 3
+====================
+Sujet :
+${subject3 || "❌ Sujet non renseigné"}
+
+Texte :
+${task3 || "❌ Texte vide"}
+`;
+
+  navigator.clipboard.writeText(prompt).then(()=>{
+    window.open("https://chat.openai.com","_blank");
+    alert("✅ Texte COPIÉ avec les dernières modifications !");
+  });
+
+});
+</script>
+
+</body>
+</html>

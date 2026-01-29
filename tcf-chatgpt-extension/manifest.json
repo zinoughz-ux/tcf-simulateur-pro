@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "TCF Auto Paste ChatGPT",
+  "version": "1.0",
+  "description": "Colle automatiquement les sujets et textes TCF dans ChatGPT",
+  "permissions": ["clipboardRead", "clipboardWrite", "tabs"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://chat.openai.com/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
+
+
+
+
+
+

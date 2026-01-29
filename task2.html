@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Tâche 2</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+<div id="timer" class="timer">60:00</div>
+
+<div class="card">
+<h2>Tâche 2 (120–150 mots)</h2>
+<input id="subject2" class="subject" placeholder="Sujet tâche 2">
+<textarea id="task2" oninput="countWords(this,'counter2',120,150)"></textarea>
+<div id="counter2" class="counter red">0 mots</div>
+
+<div class="keys">
+<button onclick="insertChar('é')">é</button>
+<button onclick="insertChar('è')">è</button>
+<button onclick="insertChar('à')">à</button>
+<button onclick="insertChar('ç')">ç</button>
+</div>
+
+<a href="task1.html">⬅ Tâche 1</a> |
+<a href="task3.html">➡ Tâche 3</a>
+</div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
+
